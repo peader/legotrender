@@ -8,7 +8,7 @@ import time
 
 def sendResultMessage(resultMessage):
     # Append the github page url
-    resultMessage = resultMessage + '\n\nhttps://github.com/peader/legotrender'
+    resultMessage = resultMessage + '\n\nhttps://github.com/peader/legotrender' + '\nCheck out the logic here: https://github.com/peader/legotrender/blob/b5b313eae4a8be882ca6e81f742033567ed86e36/bin/analyzeTrends.py#L47'
 
     subject = "Lego Trends"
     body = resultMessage
