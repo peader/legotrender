@@ -2,48 +2,69 @@
 import json
 import os
 from updateOffers import updateOffers
-from telethon import TelegramClient
+import smtplib 
+from email.mime.text import MIMEText
+import time
 
-offerJsonFile = 'data/2024_lego_eol_offers.json'
-isSkipOfferUpdate = True
+def sendResultMessage(resultMessage):
+    # Append the github page url
+    resultMessage = resultMessage + '\n\nhttps://github.com/peader/legotrender'
 
-async def sendResultMessage(resultMessage):
-    await client.send_message('me', resultMessage)
+    subject = "Lego Trends"
+    body = resultMessage
+    sender = os.environ['email_sender']
+    recipients = os.environ['email_recipients']
+    password = os.environ['email_password']
 
-api_id = os.getenv('telegram_api_id')
-api_hash = os.getenv('telegram_api_hash')
-client = TelegramClient('legotrender', api_id, api_hash)
-if(not isSkipOfferUpdate):
-    updateOffers(offerJsonFile)
+    msg = MIMEText(body)
+    msg['Subject'] = subject
+    msg['From'] = sender
+    msg['To'] = recipients
+    with smtplib.SMTP_SSL('smtp.gmail.com', 465) as smtp_server:
+        smtp_server.login(sender, password)
+        smtp_server.sendmail(sender, recipients, msg.as_string())
+    print("email sent")
 
-resultMessage = []
-with open(offerJsonFile, 'r') as f:
-    json_data = json.load(f)
+while(True):
+    offerJsonFile = os.environ['offerJsonFile']
+    isSkipOfferUpdate = os.getenv("isSkipOfferUpdate", 'False').lower() in ('true', '1', 't')
 
-    for element in json_data:
-        offers = element['offers'] 
-        legosetid = element['legosetid']
-        if(len(offers)) <= 1:
-            continue
-        if element['isRetired']:
-            continue
-        if offers[-1]['numOffers'] == 0:
-            element['isRetired'] = True
-            continue
-        # if the last offer is equal to one then send a telegram message to the trends group
-        if offers[-1]['numOffers'] == 1:
-            # send a telegram message to the trends group            
-            print('only one seller left for: ', legosetid)
-            resultMessage.append('only one seller left for: ' + legosetid)
-        if (offers[-1]['numOffers'] - offers[-2]['numOffers']) >= 3:
-            resultMessage.append('This legoset has sold out from more than 3 sellers since last checked: ' + legosetid)
-            print('This legoset has sold out from more than 3 sellers since last checked: ', legosetid)
-        if(len(offers) >= 3):
-            if (offers[-1]['numOffers'] > offers[-2]['numOffers'] and offers[-2]['numOffers'] > offers[-3]['numOffers']  ):
-                resultMessage.append('the last 3 trend checks shows fewer sellers for' + legosetid)
-                print('the last 3 trend checks shows fewer sellers for', legosetid )
-with client:
-    client.loop.run_until_complete(sendResultMessage("\n".join(resultMessage)))
+    if(not isSkipOfferUpdate):
+        updateOffers(offerJsonFile)
+
+    resultMessage = []
+    with open(offerJsonFile, 'r') as f:
+        json_data = json.load(f)
+
+        for element in json_data:
+            offers = element['offers'] 
+            legosetid = element['legosetid']
+            legoseturl = " https://brickmerge.de/" + legosetid
+            if(len(offers)) <= 1:
+                continue
+            if element['isRetired']:
+                continue
+            if offers[-1]['numOffers'] - 1 == 0:
+                element['isRetired'] = True
+                continue
+            # if the last offer is equal to one then send a telegram message to the trends group
+            if offers[-1]['numOffers'] - 1 == 1:
+                # send a telegram message to the trends group            
+                print('only one seller left for: ', legosetid)
+                resultMessage.append('only one seller left for: ' + legoseturl)
+            if (offers[-1]['numOffers'] - 1 - offers[-2]['numOffers'] - 1) >= 3:
+                resultMessage.append('This legoset has sold out from more than 3 sellers since last checked: ' + legoseturl)
+                print('This legoset has sold out from more than 3 sellers since last checked: ', legosetid)
+            if(len(offers) >= 3):
+                if (offers[-1]['numOffers'] - 1 > offers[-2]['numOffers'] - 1 and offers[-2]['numOffers'] - 1 > offers[-3]['numOffers'] - 1  ):
+                    resultMessage.append('the last 3 trend checks shows fewer sellers for' + legoseturl)
+                    print('the last 3 trend checks shows fewer sellers for', legosetid )
+
+    sendResultMessage("\n".join(resultMessage))
+
+    time.sleep(86400)
+
+
 
 
 
