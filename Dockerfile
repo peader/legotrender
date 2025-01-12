@@ -6,4 +6,4 @@ COPY bin/* /app/
 
 VOLUME data
 
-CMD ["python", "/app/analyzeTrends.py"]
+CMD ["python", "-u", "/app/analyzeTrends.py"]
