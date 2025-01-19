@@ -45,6 +45,8 @@ def updateOffers(offerJsonFile):
                         "date": datetime.now().__str__()
                     }
                 )
+                # to avoid spamming the brickmerge server will put a 20 second dely between requests
+            time.sleep(20)
     with open(offerJsonFile, 'w') as f:
         json.dump(json_data, f)
     

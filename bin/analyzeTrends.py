@@ -13,13 +13,13 @@ def sendResultMessage(resultMessage):
     subject = "Lego Trends"
     body = resultMessage
     sender = os.environ['email_sender']
-    recipients = os.environ['email_recipients']
+    recipients = os.environ['email_recipients'].split(',')
     password = os.environ['email_password']
 
     msg = MIMEText(body)
     msg['Subject'] = subject
     msg['From'] = sender
-    msg['To'] = recipients
+    msg['To'] = ', '.join(recipients)
     with smtplib.SMTP_SSL('smtp.gmail.com', 465) as smtp_server:
         smtp_server.login(sender, password)
         smtp_server.sendmail(sender, recipients, msg.as_string())
@@ -56,9 +56,14 @@ while(True):
                 resultMessage.append('This legoset has sold out from more than 3 sellers since last checked: ' + legoseturl)
                 print('This legoset has sold out from more than 3 sellers since last checked: ', legosetid)
             if(len(offers) >= 3):
-                if (offers[-1]['numOffers'] - 1 > offers[-2]['numOffers'] - 1 and offers[-2]['numOffers'] - 1 > offers[-3]['numOffers'] - 1  ):
-                    resultMessage.append('the last 3 trend checks shows fewer sellers for' + legoseturl)
-                    print('the last 3 trend checks shows fewer sellers for', legosetid )
+                trendCounter = 0
+                for i in range(len(offers),1,-1):
+                    if((offers[i-1]['numOffers'] - 1) >= (offers[i-2]['numOffers'] -1 )):
+                        break
+                    trendCounter += 1
+                if (trendCounter >= 3):
+                    resultMessage.append('the last ' + str(trendCounter) + ' trend checks shows fewer sellers for' + legoseturl)
+                    print('the last ', str(trendCounter), '  trend checks shows fewer sellers for', legosetid )
 
     sendResultMessage("\n".join(resultMessage))
 
