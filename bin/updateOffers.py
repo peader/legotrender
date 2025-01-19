@@ -2,6 +2,7 @@ import json
 import requests
 from bs4 import BeautifulSoup
 from datetime import datetime
+import time
 
 def updateOffers(offerJsonFile):
     json_data = None
@@ -19,7 +20,6 @@ def updateOffers(offerJsonFile):
             response = requests.get(url)
             if response.status_code != 200:
                 # pause for a 10 seconds and retry
-                import time
                 time.sleep(20) 
                 print("Retrying", legosetid) 
                 response = requests.get(url)
@@ -45,8 +45,9 @@ def updateOffers(offerJsonFile):
                         "date": datetime.now().__str__()
                     }
                 )
-                # to avoid spamming the brickmerge server will put a 20 second dely between requests
+            # to avoid spamming the brickmerge server will put a 20 second dely between requests
             time.sleep(20)
+
     with open(offerJsonFile, 'w') as f:
         json.dump(json_data, f)
     
