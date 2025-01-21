@@ -2,9 +2,9 @@ import json
 from datetime import datetime
 import requests
 from bs4 import BeautifulSoup
-
+# from https://www.brickfanatics.com/every-lego-set-retiring-2025-january-update/
 # Load the HTML file
-with open('data/2024bricks.html', 'r') as f:
+with open('data/2025bricks.html', 'r') as f:
     html = f.read()
 
 # Parse the HTML using BeautifulSoup
@@ -70,7 +70,7 @@ for legoset in table_data:
 
 
 # write the json result to a file
-with open('data/2024_lego_eol_offers.json', 'w') as f:
+with open('data/2025_lego_eol_offers.json', 'w') as f:
     json.dump(json_result, f)
 
 # Print the JSON data

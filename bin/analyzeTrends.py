@@ -6,11 +6,11 @@ import smtplib
 from email.mime.text import MIMEText
 import time
 
-def sendResultMessage(resultMessage):
+def sendResultMessage(resultMessage, offerJsonFileName):
     # Append the github page url
     resultMessage = resultMessage + '\n\nhttps://github.com/peader/legotrender' + '\nCheck out the logic here: https://github.com/peader/legotrender/blob/b5b313eae4a8be882ca6e81f742033567ed86e36/bin/analyzeTrends.py#L47'
 
-    subject = "Lego Trends"
+    subject = "Lego Trends for: " + offerJsonFileName
     body = resultMessage
     sender = os.environ['email_sender']
     recipients = os.environ['email_recipients'].split(',')
@@ -65,7 +65,7 @@ while(True):
                     resultMessage.append('the last ' + str(trendCounter) + ' trend checks shows fewer sellers for' + legoseturl)
                     print('the last ', str(trendCounter), '  trend checks shows fewer sellers for', legosetid )
 
-    sendResultMessage("\n".join(resultMessage))
+    sendResultMessage("\n".join(resultMessage), offerJsonFile)
 
     time.sleep(86400)
 
