@@ -17,7 +17,13 @@ def updateOffers(offerJsonFile):
             offers = element['offers']
             url = "https://brickmerge.de/" + legosetid
             # get the web response for https://bricksmerge.de/legosetid
-            response = requests.get(url)
+            try:
+                response = requests.get(url)
+            except Exception:
+                time.sleep(20) 
+                print("Retrying", legosetid) 
+                response = requests.get(url)
+
             if response.status_code != 200:
                 # pause for a 10 seconds and retry
                 time.sleep(20) 
