@@ -2,7 +2,7 @@
 import json
 import os
 from updateOffers import updateOffers
-import smtplib 
+import smtplib, ssl 
 from email.mime.text import MIMEText
 import time
 
@@ -20,9 +20,11 @@ def sendResultMessage(resultMessage, offerJsonFileName):
     msg['Subject'] = subject
     msg['From'] = sender
     msg['To'] = ', '.join(recipients)
+    context = ssl.create_default_context()
     with smtplib.SMTP_SSL('smtp.gmail.com', 587) as smtp_server:
         server.ehlo()
-        server.starttls()
+        server.starttls(context=context)
+        server.ehlo()
         smtp_server.login(sender, password)
         smtp_server.sendmail(sender, recipients, msg.as_string())
     print("email sent")
