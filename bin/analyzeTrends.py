@@ -20,7 +20,9 @@ def sendResultMessage(resultMessage, offerJsonFileName):
     msg['Subject'] = subject
     msg['From'] = sender
     msg['To'] = ', '.join(recipients)
-    with smtplib.SMTP_SSL('smtp.gmail.com', 465) as smtp_server:
+    with smtplib.SMTP_SSL('smtp.gmail.com', 587) as smtp_server:
+        server.ehlo()
+        server.starttls()
         smtp_server.login(sender, password)
         smtp_server.sendmail(sender, recipients, msg.as_string())
     print("email sent")
